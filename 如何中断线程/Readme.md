@@ -1,4 +1,4 @@
-## 三个方法
+## 中断相关三个方法
 
 * interrupt()
 
@@ -39,3 +39,138 @@
   * interrupted() ：判断线程是否处于中断状态，并重置中断状态。
   * isInterrupted()：判断线程是否处于中断状态，不会重置中断状态。
 
+## 聊一下如何中断线程？
+
+* 原生的中断通知与中断检测
+
+  上代码。
+
+  ```java
+      public static void main(String[] args) {
+          Thread thread = new Thread(() -> {
+              while (true) {
+                  Thread.yield();
+  
+                  // 响应中断
+                  if (Thread.currentThread().isInterrupted()) {
+                      System.out.println("青秧线程被中断，程序退出。");
+                      return;
+                  }
+              }
+          });
+          thread.start();
+          thread.interrupt();
+      }
+  ```
+
+* 条件变量 ，更优雅的方式
+
+  ```java
+  public class InterruptThread extends Thread{
+      public volatile boolean running = true;  //重点:volatile
+  
+      public static void main(String[] args) throws InterruptedException {
+          InterruptThread interruptThread = new InterruptThread();
+          interruptThread.start();
+          Thread.sleep(10);
+          interruptThread.running = false;
+      }
+  
+      public void run(){
+          int n = 0;
+          while (running) {
+              n++;
+              System.out.println(n + " hello!");
+          }
+          System.out.println("end!");
+      }
+  }
+  ```
+
+## 中断处理与中断传播
+
+```java
+public class MyThread extends Thread {
+    @Override
+    public void run() {
+        super.run();
+        try{
+            for (int i = 0; i < 500000; i++) {
+                if (this.interrupted()) {
+                    System.out.println("should be stopped and exit");
+                    throw new InterruptedException();
+                }
+                System.out.println("i=" + (i + 1));
+            }
+            System.out.println("this line cannot be executed. cause thread throws exception");
+        }catch(InterruptedException e){
+            /**这样处理不好
+             * System.out.println("catch interrupted exception");
+             * e.printStackTrace();
+             */
+             Thread.currentThread().interrupt();//这样处理比较好
+        }
+    }
+}
+```
+
+## Sleep与中断
+
+```java
+private static void test3() throws InterruptedException {
+	Thread thread = new Thread(() -> {
+		while (true) {
+			// 响应中断
+			if (Thread.currentThread().isInterrupted()) {
+				System.out.println("Java技术栈线程被中断，程序退出。");
+				return;
+			}
+
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				System.out.println("Java技术栈线程休眠被中断，程序退出。");
+			}
+		}
+	});
+	thread.start();
+	Thread.sleep(2000);
+	thread.interrupt();
+}
+```
+
+该示例会中断失败，因为sleep会清除中断标记。
+
+```java
+private static void test4() throws InterruptedException {
+	Thread thread = new Thread(() -> {
+		while (true) {
+			// 响应中断
+			if (Thread.currentThread().isInterrupted()) {
+				System.out.println("Java技术栈线程被中断，程序退出。");
+				return;
+			}
+
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				System.out.println("Java技术栈线程休眠被中断，程序退出。");
+				Thread.currentThread().interrupt();
+			}
+		}
+	});
+	thread.start();
+	Thread.sleep(2000);
+	thread.interrupt();
+}
+```
+
+对比该代码，解决方案就是传播中断。
+
+## 参考
+
+1、https://www.cnblogs.com/hapjin/p/5450779.html
+
+2、https://zhuanlan.zhihu.com/p/149205707
+
+3、https://www.cnblogs.com/wulianshang/p/5801902.html
