@@ -5,3 +5,4 @@
 * 如何中断线程
 * 三个线程顺序打印ABC
 
+* springboot集成caffeine
