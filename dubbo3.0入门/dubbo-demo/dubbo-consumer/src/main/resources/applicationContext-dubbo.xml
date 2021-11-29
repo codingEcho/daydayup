@@ -20,7 +20,7 @@
     <dubbo:registry address="zookeeper://localhost:2181" client="curator"/>
 
     <!-- 调用远程Producer的服务 -->
-    <dubbo:reference id="producerService" interface="com.example.dubbo.service.GreetingsService" />
+    <dubbo:reference id="producerService" interface="com.example.dubbo.service.HelloService" />
 
 </beans>
 
