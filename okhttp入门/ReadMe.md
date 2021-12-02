@@ -2,7 +2,7 @@
 
 ```java
         client = new OkHttpClient.Builder()
-                .addInterceptor(new GzipRequestInterceptor())
+              	.addInterceptor(new GzipRequestInterceptor())
 				.connectionPool(new ConnectionPool(10, 500, TimeUnit.MILLISECONDS))
                 .readTimeout(30, TimeUnit.SECONDS)
                 .connectTimeout(30, TimeUnit.SECONDS)
