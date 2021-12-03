@@ -112,23 +112,23 @@ exportfs
 
 * 执行以下命令检查 nfs 服务器端是否有设置共享目录
 
-```bash
-# showmount -e $(nfs服务器的IP)
-showmount -e 172.17.216.82
-# 输出结果如下所示
-Export list for 172.17.216.82:
-/root/nfs_root *
-```
+  ```bash
+  # showmount -e $(nfs服务器的IP)
+  showmount -e 172.17.216.82
+  # 输出结果如下所示
+  Export list for 172.17.216.82:
+  /root/nfs_root *
+  ```
 
 * 执行以下命令挂载 nfs 服务器上的共享目录到本机路径 `/root/nfsmount`
 
-```bash
-mkdir /root/nfsmount
-# mount -t nfs $(nfs服务器的IP):/root/nfs_root /root/nfsmount
-mount -t nfs 172.17.216.82:/root/nfs_root /root/nfsmount
-# 写入一个测试文件
-echo "hello nfs server" > /root/nfsmount/test.txt
-```
+  ```bash
+  mkdir /root/nfsmount
+  # mount -t nfs $(nfs服务器的IP):/root/nfs_root /root/nfsmount
+  mount -t nfs 172.17.216.82:/root/nfs_root /root/nfsmount
+  # 写入一个测试文件
+  echo "hello nfs server" > /root/nfsmount/test.txt
+  ```
 
 * 在 nfs 服务器上执行以下命令，验证文件写入成功
 
